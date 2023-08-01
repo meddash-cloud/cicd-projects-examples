@@ -7,7 +7,7 @@ env:
 on:
   push:
     branches:
-      - 'main'
+      - 'cicd-ex-001'
 
 jobs:
   build-test:
