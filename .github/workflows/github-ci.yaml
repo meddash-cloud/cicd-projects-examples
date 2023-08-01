@@ -8,7 +8,7 @@ env:
 on:
   push:
     branches:
-      - "${{env.BRANCH_NAME}}"
+      - 'cicd-ex-001'
 
 jobs:
   build-test:
