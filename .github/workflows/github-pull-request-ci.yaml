@@ -1,0 +1,63 @@
+name: cicd-ex-002-pull-request
+
+env:
+  DEPLOYMENT_REPO_NAME: cicd-deployments
+  #branch name should also match the directory name in the $DEPLOYMENT_REPO_NAME
+  BRANCH_NAME: cicd-ex-002
+  
+on:
+  push:
+    branches:
+      - 'cicd-ex-002'
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "start to build and test the golang gin helloworld app"
+  docker-build-and-push:
+    runs-on: ubuntu-latest
+    needs: build-test
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      -
+        name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      -
+        name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: ${{env.BRANCH_NAME}}  # this is the directory name in the branch , although the varible name says it is a branch name
+          file: ${{env.BRANCH_NAME}}/Dockerfile
+          push: true
+          tags: halilagin/meddash-${{env.BRANCH_NAME}}:${{ github.sha }}
+  update-deployment-helm-values-and-push:
+    runs-on: ubuntu-latest
+    needs: docker-build-and-push
+    steps:
+      - run: |
+          echo "updating image tag in $BRANCH_NAME/heml/http-service/values.yaml "
+          git config --global user.email meddash-ci-bot@meddash.cloud && git config --global user.name meddash-ci-bot
+          echo "clone repo $DEPLOYMENT_REPO_NAME"
+          echo git clone https://oauth2:${{ secrets.DEPLOYMENT_REPO_PAT }}@github.com/${{ github.repository_owner }}/$DEPLOYMENT_REPO_NAME.git
+          git clone https://oauth2:${{ secrets.DEPLOYMENT_REPO_PAT }}@github.com/${{ github.repository_owner }}/$DEPLOYMENT_REPO_NAME.git
+          cd $DEPLOYMENT_REPO_NAME
+          echo "checkout main branch"
+          git checkout main
+          ls 
+          sed -i "s,tag:.*,tag:\ ${{ github.sha }}," $BRANCH_NAME/helm/http-service/values.yaml
+          git add . 
+          git commit -m "update image tag in heml values.yaml"
+          git push
+
