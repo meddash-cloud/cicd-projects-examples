@@ -38,8 +38,8 @@ jobs:
         name: Build and push
         uses: docker/build-push-action@v2
         with:
-          context: ${{env.BRANCH_NAME}}  # this is the directory name in the branch , although the varible name says it is a branch name
-          file: Dockerfile
+          context: .  # this is the directory name in the branch , although the varible name says it is a branch name
+          file: ${{env.BRANCH_NAME}}/Dockerfile
           push: true
           tags: halilagin/meddash-${{env.BRANCH_NAME}}:${{ github.sha }}
   update-deployment-helm-values-and-push:
