@@ -54,7 +54,7 @@ jobs:
           git clone https://oauth2:${{ secrets.DEPLOYMENT_REPO_PAT }}@github.com/${{ github.repository_owner }}/$DEPLOYMENT_REPO_NAME.git
           cd $DEPLOYMENT_REPO_NAME
           echo "checkout main branch"
-          git checkout main
+          git checkout ${{ github.event.pull_request.head.ref  }}
           ls 
           sed -i "s,tag:.*,tag:\ ${{ github.event.pull_request.head.sha }}," $BRANCH_NAME/helm/http-service/values.yaml
           git add . 
