@@ -56,6 +56,7 @@ jobs:
           cd $MYREPO_NAME
           echo "checkout pullrequest head ref"
           git checkout ${{ github.event.pull_request.head.ref  }}
+          echo "set image tag in values.yaml"
           echo "'--' is used to disambiguate branch name and directory name having the same name of branch"
           sed -i "s,tag:.*,tag:\ ${{ github.event.pull_request.head.sha }}," -- $BRANCH_NAME/helm/http-service/values.yaml
           git add . 
