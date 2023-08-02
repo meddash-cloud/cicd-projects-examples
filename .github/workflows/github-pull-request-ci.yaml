@@ -55,8 +55,8 @@ jobs:
           git clone https://oauth2:${{ secrets.DEPLOYMENT_REPO_PAT }}@github.com/${{ github.repository_owner }}/$MYREPO_NAME.git
           cd $MYREPO_NAME
           echo "checkout pullrequest head ref"
-          git checkout ${{ github.event.pull_request.head.ref  }}
-          echo "set image tag in values.yaml"
+          # -- is put to make it clear that we checkout the branch not a file
+          git checkout  ${{ github.event.pull_request.head.ref  }} --
           echo "'--' is used to disambiguate branch name and directory name having the same name of branch"
           sed -i "s,tag:.*,tag:\ ${{ github.event.pull_request.head.sha }}," -- $BRANCH_NAME/helm/http-service/values.yaml
           git add . 
