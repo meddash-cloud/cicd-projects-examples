@@ -56,7 +56,7 @@ jobs:
           echo "checkout main branch"
           git checkout main
           ls 
-          sed -i "s,tag:.*,tag:\ ${{ github.sha }}," $BRANCH_NAME/helm/http-service/values.yaml
+          sed -i "s,tag:.*,tag:\ ${{ github.event.pull_request.head.sha }}," $BRANCH_NAME/helm/http-service/values.yaml
           git add . 
           git commit -m "update image tag in heml values.yaml"
           git push
