@@ -8,7 +8,7 @@ image:
   repository: halilagin/cicd-projects-examples
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: 8b053743e054676a3a9be2154c87e79c3054c1c9
+  tag: bc02342a6b4f7f6d58ca2b1cd7cec3814dae5efb
 
 imagePullSecrets: []
 nameOverride: ""
