@@ -1,6 +1,7 @@
 name: cicd-ex-001-golang-ci
 
 env:
+  MYREPO_NAME: cicd-projects-examples
   DEPLOYMENT_REPO_NAME: cicd-deployments
   #branch name should also match the directory name in the $DEPLOYMENT_REPO_NAME
   BRANCH_NAME: cicd-ex-002
@@ -49,11 +50,11 @@ jobs:
       - run: |
           echo "updating image tag in $BRANCH_NAME/heml/http-service/values.yaml "
           git config --global user.email meddash-ci-bot@meddash.cloud && git config --global user.name meddash-ci-bot
-          echo "clone repo $DEPLOYMENT_REPO_NAME"
-          echo git clone https://oauth2:${{ secrets.DEPLOYMENT_REPO_PAT }}@github.com/${{ github.repository_owner }}/$DEPLOYMENT_REPO_NAME.git
-          git clone https://oauth2:${{ secrets.DEPLOYMENT_REPO_PAT }}@github.com/${{ github.repository_owner }}/$DEPLOYMENT_REPO_NAME.git
+          echo "clone repo $MYREPO_NAME"
+          echo git clone https://oauth2:${{ secrets.DEPLOYMENT_REPO_PAT }}@github.com/${{ github.repository_owner }}/$MYREPO_NAME.git
+          git clone https://oauth2:${{ secrets.DEPLOYMENT_REPO_PAT }}@github.com/${{ github.repository_owner }}/$MYREPO_NAMEDEPLOYMENT_REPO_NAME.git
           cd $DEPLOYMENT_REPO_NAME
-          echo "checkout main branch"
+          echo "checkout pullrequest head ref"
           git checkout ${{ github.event.pull_request.head.ref  }}
           ls 
           sed -i "s,tag:.*,tag:\ ${{ github.event.pull_request.head.sha }}," $BRANCH_NAME/helm/http-service/values.yaml
