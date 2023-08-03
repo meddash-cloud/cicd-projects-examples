@@ -56,9 +56,10 @@ jobs:
           cd $DEPLOYMENT_REPO_NAME
           echo "checkout pullrequest head ref"
           # -- is put to make it clear that we checkout the branch not a file
-          git checkout  ${{ github.event.pull_request.head.ref  }} --
+          #git checkout  ${{ github.event.pull_request.head.ref  }} --
+          git checkout  main
           echo "'--' is used to disambiguate branch name and directory name having the same name of branch"
-          sed -i "s,tag:.*,tag:\ ${{ github.event.pull_request.head.sha }}," -- $BRANCH_NAME/helm/http-service/values.yaml
+          sed -i "s,tag:.*,tag:\ ${{ github.event.pull_request.head.sha }},"  $BRANCH_NAME/helm/http-service/values.yaml
           git add . 
           git commit -m "update image tag in heml values.yaml"
           git push
