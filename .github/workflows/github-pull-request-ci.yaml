@@ -50,10 +50,10 @@ jobs:
       - run: |
           echo "updating image tag in $BRANCH_NAME/heml/http-service/values.yaml "
           git config --global user.email meddash-ci-bot@meddash.cloud && git config --global user.name meddash-ci-bot
-          echo "clone repo $MYREPO_NAME"
-          echo git clone https://oauth2:${{ secrets.PAT }}@github.com/${{ github.repository_owner }}/$MYREPO_NAME.git
-          git clone https://oauth2:${{ secrets.PAT }}@github.com/${{ github.repository_owner }}/$MYREPO_NAME.git
-          cd $MYREPO_NAME
+          echo "clone repo $DEPLOYMENT_REPO_NAME"
+          echo git clone https://oauth2:${{ secrets.DEPLOYMENT_REPO_PAT }}@github.com/${{ github.repository_owner }}/$DEPLOYMENT_REPO_NAME.git
+          git clone https://oauth2:${{ secrets.DEPLOYMENT_REPO_PAT }}@github.com/${{ github.repository_owner }}/$DEPLOYMENT_REPO_NAME.git
+          cd $DEPLOYMENT_REPO_NAME
           echo "checkout pullrequest head ref"
           # -- is put to make it clear that we checkout the branch not a file
           #git checkout  ${{ github.event.pull_request.head.ref  }} --
