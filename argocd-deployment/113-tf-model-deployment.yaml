@@ -20,7 +20,7 @@ spec:
       volumes:
       - name: shared-volume
         emptyDir: {}
-      containers:
+      initContainers:
       - name: download-trained-model
         image: alpine
         env:
@@ -49,6 +49,7 @@ spec:
         volumeMounts:
         - name: shared-volume
           mountPath: /ml-model
+      containers:
       - name: tf-serve-trained-model
         volumeMounts:
         - name: shared-volume

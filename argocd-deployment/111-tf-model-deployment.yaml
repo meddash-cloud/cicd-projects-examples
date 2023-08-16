@@ -8,31 +8,6 @@ spec:
   accessModes: [ReadWriteOnce]
   resources: { requests: { storage: 1Gi } }
 ---
-apiVersion: v1
-kind: Pod
-metadata:
-  name: pod-download-training-code
-  namespace: kubeflow
-spec:
-  volumes:
-    - name: pvc
-      persistentVolumeClaim:
-        claimName: pvc-tf-train
-  containers:
-  - name: download-training-code
-    image: alpine/git:latest
-    env:
-    - name: MEDDASH_BRANCH_NAME
-      value: "datapipelines-027"
-    volumeMounts:
-      - name: pvc
-        mountPath: "/home/jovyan/git-volume"
-    command:
-    - /bin/sh
-    - -c
-    - |
-      while true; do sleep 10; done
----
 apiVersion: batch/v1
 kind: Job
 metadata:
