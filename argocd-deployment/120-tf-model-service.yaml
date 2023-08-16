@@ -4,12 +4,12 @@ metadata:
   name: tf-model-service
   namespace: kubeflow
   labels:
-    app: tf-model-service
+    app: tf-serve-train-model
 spec:
   ports:
   - port: 80
     protocol: TCP
     targetPort: 8080
   selector:
-    app: tf-serve-detect-digits
+    app: tf-serve-train-model
 
