@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: tf-model-service
+  namespace: kubeflow
+  annotations:
+    argocd.argoproj.io/sync-wave: "120"
+
+  labels:
+    app: tf-model-service
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: tf-serve-detect-digits
+
