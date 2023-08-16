@@ -38,7 +38,7 @@ spec:
     volumeMounts:
     - name: shared-volume
       mountPath: /ml-model
-   -name: tf-serve-trained-model
+  - name: tf-serve-trained-model
     volumeMounts:
     - name: shared-volume
       mountPath: /ml-model
