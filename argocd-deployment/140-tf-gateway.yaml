@@ -7,7 +7,6 @@ metadata:
   namespace: kubeflow
   annotations:
     cloud.meddash.command.create.dnsname:  app.${MEDDASH_CLUSTER_ID}.hosted.meddash.cloud
-    argocd.argoproj.io/sync-wave: "140"
 
 spec:
   selector:

@@ -3,9 +3,6 @@ kind: Service
 metadata:
   name: tf-model-service
   namespace: kubeflow
-  annotations:
-    argocd.argoproj.io/sync-wave: "120"
-
   labels:
     app: tf-model-service
 spec:

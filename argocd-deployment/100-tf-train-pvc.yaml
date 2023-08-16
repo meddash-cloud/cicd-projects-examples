@@ -4,8 +4,6 @@ kind: PersistentVolumeClaim
 metadata:
   name: pvc-tf-train
   namespace: kubeflow
-  annotations:
-    argocd.argoproj.io/sync-wave: "100"
 spec:
   accessModes: [ReadWriteOnce]
   resources: { requests: { storage: 1Gi } }

@@ -4,8 +4,6 @@ kind: VirtualService
 metadata:
   name: vs-tf-serve
   namespace: kubeflow
-  annotations:
-    argocd.argoproj.io/sync-wave: "130"
 
 spec:
   hosts:
