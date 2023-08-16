@@ -32,6 +32,7 @@ spec:
     - -c
     - |
       while true; do sleep 10; done
+---
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -66,7 +67,7 @@ spec:
           rm -rf /home/jovyan/git-volume/*
           git clone --branch $MEDDASH_BRANCH_NAME  https://github.com/meddash-cloud/cicd-projects-examples.git /home/jovyan/git-volume/src
           chmod -R 777 /home/jovyan/git-volume/*
-    ---
+---
 apiVersion: batch/v1
 kind: Job
 metadata:
