@@ -11,67 +11,67 @@ spec:
     emptyDir: {}
   containers:
   - name: download-trained-model
-     image: alpine
-     env:
-     - name: MEDDASH_AWS_ACCESS_KEY_ID
-       valueFrom:
-         secretKeyRef:
-           name: mlpipeline-minio-artifact
-           key: accesskey
-     - name: MEDDASH_AWS_SECRET_ACCESS_KEY
-       valueFrom:
-         secretKeyRef:
-           name: mlpipeline-minio-artifact
-           key: secretkey
-     command: 
-     - /bin/sh
-     - -c
-     - |
-       mkdir -p /tmp/minio-client
-       wget https://dl.min.io/client/mc/release/linux-amd64/mc \
-       -O /tmp/minio-client/mc
-       chmod +x /tmp/minio-client/mc
-       alias mc=/tmp/minio-client/mc
-       mc alias set myminio http://minio-service.kubeflow.svc.cluster.local:9000  $MEDDASH_AWS_ACCESS_KEY_ID  $MEDDASH_AWS_SECRET_ACCESS_KEY
-       mc cp --recursive  myminio/datapipeline-024/models/trained/detect-digits /ml-model/
-       touch /ml-model/ml-model-downloaded; 
-     volumeMounts:
-     - name: shared-volume
-       mountPath: /ml-model
-   - name: tf-serve-trained-model
-     volumeMounts:
-     - name: shared-volume
-       mountPath: /ml-model
-     image: tensorflow/serving:2.6.2
-     env:
-     - name: MODEL_NAME
-       value: detect-digits
-     command:
-     - /usr/bin/tensorflow_model_server
-     args:
-     - --model_name=detect-digits
-     - --port=9000
-     - --rest_api_port=8080
-     - --model_base_path=/ml-model/detect-digits
-     - --rest_api_timeout_in_ms=60000
-     ports:
-     - containerPort: 8080
-       protocol: TCP
-     resources:
-       limits:
-         cpu: "1"
-         memory: 1Gi
-       requests:
-         cpu: "500m"
-         memory: 1Gi
-     livenessProbe:
-       tcpSocket:
-         port: 8080
-       initialDelaySeconds: 60
-       periodSeconds: 10
-     readinessProbe:
-       httpGet:
-         path: /v1/models/detect-digits
-         port: 8080
-       initialDelaySeconds: 60
-       periodSeconds: 10
+    image: alpine
+    env:
+    - name: MEDDASH_AWS_ACCESS_KEY_ID
+      valueFrom:
+        secretKeyRef:
+          name: mlpipeline-minio-artifact
+          key: accesskey
+    - name: MEDDASH_AWS_SECRET_ACCESS_KEY
+      valueFrom:
+        secretKeyRef:
+          name: mlpipeline-minio-artifact
+          key: secretkey
+    command: 
+    - /bin/sh
+    - -c
+    - |
+      mkdir -p /tmp/minio-client
+      wget https://dl.min.io/client/mc/release/linux-amd64/mc \
+      -O /tmp/minio-client/mc
+      chmod +x /tmp/minio-client/mc
+      alias mc=/tmp/minio-client/mc
+      mc alias set myminio http://minio-service.kubeflow.svc.cluster.local:9000  $MEDDASH_AWS_ACCESS_KEY_ID  $MEDDASH_AWS_SECRET_ACCESS_KEY
+      mc cp --recursive  myminio/datapipeline-024/models/trained/detect-digits /ml-model/
+      touch /ml-model/ml-model-downloaded; 
+    volumeMounts:
+    - name: shared-volume
+      mountPath: /ml-model
+   -name: tf-serve-trained-model
+    volumeMounts:
+    - name: shared-volume
+      mountPath: /ml-model
+    image: tensorflow/serving:2.6.2
+    env:
+    - name: MODEL_NAME
+      value: detect-digits
+    command:
+    - /usr/bin/tensorflow_model_server
+    args:
+    - --model_name=detect-digits
+    - --port=9000
+    - --rest_api_port=8080
+    - --model_base_path=/ml-model/detect-digits
+    - --rest_api_timeout_in_ms=60000
+    ports:
+    - containerPort: 8080
+      protocol: TCP
+    resources:
+      limits:
+        cpu: "1"
+        memory: 1Gi
+      requests:
+        cpu: "500m"
+        memory: 1Gi
+    livenessProbe:
+      tcpSocket:
+        port: 8080
+      initialDelaySeconds: 60
+      periodSeconds: 10
+    readinessProbe:
+      httpGet:
+        path: /v1/models/detect-digits
+        port: 8080
+      initialDelaySeconds: 60
+      periodSeconds: 10

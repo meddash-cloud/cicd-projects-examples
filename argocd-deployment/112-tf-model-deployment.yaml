@@ -13,18 +13,18 @@ spec:
 
   containers:
   - name: run-jupyter-trainer
-     image: jupyter/tensorflow-notebook
-     env:
-     - name: MEDDASH_BRANCH_NAME
-       value: "datapipelines-027"
-     - name: MEDDASH_CLUSTER_ID
-       value: "v1005r7c-bfef-4f0b-8028-99d5fdcf47de"
-     volumeMounts:
-       - name: pvc
-         mountPath: "/home/jovyan/git-volume"
-     command:
-     - /bin/sh
-     - -c
-     - |
-       pip install  --quiet kfp==1.8.22
-       ipython /home/jovyan/git-volume/src/$MEDDASH_BRANCH_NAME/030-pipeline-builder.ipynb >/tmp/jupyter-runner.output 2>&1
+    image: jupyter/tensorflow-notebook
+    env:
+    - name: MEDDASH_BRANCH_NAME
+      value: "datapipelines-027"
+    - name: MEDDASH_CLUSTER_ID
+      value: "v1005r7c-bfef-4f0b-8028-99d5fdcf47de"
+    volumeMounts:
+      - name: pvc
+        mountPath: "/home/jovyan/git-volume"
+    command:
+    - /bin/sh
+    - -c
+    - |
+      pip install  --quiet kfp==1.8.22
+      ipython /home/jovyan/git-volume/src/$MEDDASH_BRANCH_NAME/030-pipeline-builder.ipynb >/tmp/jupyter-runner.output 2>&1
