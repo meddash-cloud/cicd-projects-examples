@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: download-training-code
+  name: run-jupyter-trainer
   namespace: kubeflow
   annotations:
     argocd.argoproj.io/hook: Sync

@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tf-serve-train-model
+  name: serve-train-model
   namespace: kubeflow
   annotations:
     argocd.argoproj.io/hook: Sync
@@ -11,11 +11,11 @@ spec:
   replicas: 1
   selector:
   matchLabels:
-    app: tf-serve-train-model
+    app: serve-train-model
   template:
     metadata:
       labels:
-        app: tf-serve-train-model
+        app: serve-train-model
     spec:
       volumes:
       - name: shared-volume
