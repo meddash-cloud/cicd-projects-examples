@@ -10,12 +10,8 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: download-training-code
+  name: dummy-pod-for-pvc-bind
   namespace: kubeflow
-  annotations:
-    argocd.argoproj.io/hook: Sync
-    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
-    argocd.argoproj.io/sync-wave: "1"
 spec:
   restartPolicy: Never
   volumes:
