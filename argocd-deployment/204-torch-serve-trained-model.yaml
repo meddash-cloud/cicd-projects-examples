@@ -43,7 +43,6 @@ spec:
         - /bin/sh
         - -c
         - |
-          while true; do sleep 10; done
           mkdir -p /tmp/minio-client
           wget https://dl.min.io/client/mc/release/linux-amd64/mc  -O /tmp/minio-client/mc
           chmod +x /tmp/minio-client/mc
