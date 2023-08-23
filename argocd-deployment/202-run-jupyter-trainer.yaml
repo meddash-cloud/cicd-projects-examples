@@ -1,0 +1,33 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: download-training-code
+  namespace: kubeflow
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    argocd.argoproj.io/sync-wave: 2
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      volumes:
+      - name: pvc
+        persistentVolumeClaim:
+          claimName: pvc-tf-train
+      containers:
+      - name: run-jupyter-trainer
+        image: kubeflownotebookswg/jupyter-pytorch-full
+        env:
+        - name: MEDDASH_BRANCH_NAME
+          value: "datapipelines-029"
+        - name: MEDDASH_CLUSTER_ID
+          value: "v1005r7c-bfef-4f0b-8028-99d5fdcf47de"
+        volumeMounts:
+        - name: pvc
+          mountPath: "/home/jovyan/git-volume"
+        command:
+        - /bin/sh
+        - -c
+        - |
+          cd /home/jovyan/git-volume/src/$MEDDASH_BRANCH_NAME/ && ipython 020-pipeline-step-04-run.ipynb

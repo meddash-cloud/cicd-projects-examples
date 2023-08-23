@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tf-serve-train-model
+  namespace: kubeflow
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    argocd.argoproj.io/sync-wave: 4
+spec:
+  replicas: 1
+  selector:
+  matchLabels:
+    app: tf-serve-train-model
+  template:
+    metadata:
+      labels:
+        app: tf-serve-train-model
+    spec:
+      volumes:
+      - name: shared-volume
+        emptyDir: {}
+      initContainers:
+      - name: download-trained-model
+        image: alpine
+        volumeMounts:
+        - name: shared-volume
+          mountPath: /ml-model
+        env:
+        - name: MEDDASH_BRANCH_NAME
+          value: "datapipelines-029"
+        - name: MEDDASH_AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: mlpipeline-minio-artifact
+              key: accesskey
+        - name: MEDDASH_AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: mlpipeline-minio-artifact
+              key: secretkey
+        command:
+        - /bin/sh
+        - -c
+        - |
+          mkdir -p /tmp/minio-client
+          wget https://dl.min.io/client/mc/release/linux-amd64/mc  -O /tmp/minio-client/mc
+          chmod +x /tmp/minio-client/mc
+          alias mc=/tmp/minio-client/mc
+          mc alias set myminio http://minio-service.kubeflow.svc.cluster.local:9000  $MEDDASH_AWS_ACCESS_KEY_ID  $MEDDASH_AWS_SECRET_ACCESS_KEY
+          mc cp --recursive  myminio/$MEDDASH_BRANCH_NAME/models/trained/detect-digits /ml-model/
+          touch /ml-model/ml-model-downloaded; 
+          chmod -R 777 /ml-model
+      containers:
+      - name: torch-serve-trained-model
+        volumeMounts:
+        - name: shared-volume
+          mountPath: /ml-model
+        image: pytorch/torchserve-kfs:0.7.0
+        env:
+        - name: MODEL_NAME
+          value: "detect-digits"
+        - name: MODEL_VERSION
+          value: "22"
+        command:
+        - /bin/sh
+        - -c
+        - |
+          #while true; do sleep 10; done
+          pip install torch-model-archiver torchserve
+          mkdir -p /ml-model/model_store
+          torch-model-archiver --force --model-name $MODEL_NAME --version 1.0  --serialized-file /ml-model/$MODEL_NAME/$MODEL_VERSION/mnist.pt --model-file /ml-model/$MODEL_NAME/$MODEL_VERSION/mnist_model.py --export-path /ml-model/model_store  --handler=/ml-model/$MODEL_NAME/$MODEL_VERSION/handler.py
+          echo models in model_store
+          ls -al /ml-model/model_store
+          echo "inference_address=http://0.0.0.0:8080" >/ml-model/config.properties
+
+          #while true; do sleep 10; done
+          cd /ml-model/model_store && torchserve --start --foreground --model-store=/ml-model/model_store --models $MODEL_NAME=$MODEL_NAME.mar --ts-config /ml-model/config.properties
+          echo torchserve killed
+          #while true; do sleep 10; done
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        resources:
+          limits:
+            cpu: "2"
+            memory: 1Gi
+          requests:
+            cpu: "1000m"
+            memory: 1Gi
+        livenessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ping
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
