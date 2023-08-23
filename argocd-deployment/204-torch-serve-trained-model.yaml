@@ -6,12 +6,12 @@ metadata:
   annotations:
     argocd.argoproj.io/hook: Sync
     argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
-    argocd.argoproj.io/sync-wave: 4
+    argocd.argoproj.io/sync-wave: "4"
 spec:
   replicas: 1
   selector:
-  matchLabels:
-    app: serve-train-model
+    matchLabels:
+      app: serve-train-model
   template:
     metadata:
       labels:
