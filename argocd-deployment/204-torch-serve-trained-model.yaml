@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: serve-train-model
+  namespace: kubeflow
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    argocd.argoproj.io/sync-wave: "4"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: serve-train-model
+  template:
+    metadata:
+      labels:
+        app: serve-train-model
+    spec:
+      volumes:
+      - name: shared-volume
+        emptyDir: {}
+      initContainers:
+      - name: download-trained-model
+        image: alpine
+        volumeMounts:
+        - name: shared-volume
+          mountPath: /ml-model
+        env:
+        - name: MEDDASH_BRANCH_NAME
+          value: "datapipelines-033"
+        - name: MEDDASH_AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: mlpipeline-minio-artifact
+              key: accesskey
+        - name: MEDDASH_AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: mlpipeline-minio-artifact
+              key: secretkey
+        command:
+        - /bin/sh
+        - -c
+        - |
+          mkdir -p /tmp/minio-client
+          wget https://dl.min.io/client/mc/release/linux-amd64/mc  -O /tmp/minio-client/mc
+          chmod +x /tmp/minio-client/mc
+          alias mc=/tmp/minio-client/mc
+          mc alias set myminio http://minio-service.kubeflow.svc.cluster.local:9000  $MEDDASH_AWS_ACCESS_KEY_ID  $MEDDASH_AWS_SECRET_ACCESS_KEY
+          mc cp --recursive  myminio/$MEDDASH_BRANCH_NAME/models/trained/iris /ml-model/
+          touch /ml-model/ml-model-downloaded; 
+          chmod -R 777 /ml-model
+      containers:
+      - name: torch-serve-trained-model
+        volumeMounts:
+        - name: shared-volume
+          mountPath: /ml-model
+          image: seldonio/mlserver:1.3.5
+        env:
+        - name: MODEL_NAME
+          value: "iris"
+        - name: MODEL_VERSION
+          value: "4"
+        command:
+        - /bin/sh
+        - -c
+        - |
+          cat <<EOF > /ml-model/$MODEL_NAME/$MODEL_VERSION/model-settings.json
+          {
+            "name": "${MODEL_NAME}",
+            "implementation": "mlserver_sklearn.SKLearnModel",
+            "parameters": {
+              "uri": "./iris.model.classifier.joblib",
+              "version": "${MODEL_VERSION}"
+            }
+          }
+          EOF
+          cd /ml-model/$MODEL_NAME/$MODEL_VERSION/ && mlserver start .
+          echo mlserver killed
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        resources:
+          limits:
+            cpu: "1"
+            memory: "500Mi"
+          requests:
+            cpu: "500m"
+            memory: "128Mi"
+        livenessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /v2/health/ready
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
