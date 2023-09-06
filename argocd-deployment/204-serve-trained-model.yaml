@@ -23,6 +23,9 @@ spec:
       initContainers:
       - name: download-trained-model
         image: alpine
+        securityContext:
+          runAsUser: 0
+          privileged: true
         volumeMounts:
         - name: shared-volume
           mountPath: /ml-model
