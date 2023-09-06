@@ -28,7 +28,7 @@ spec:
           mountPath: /ml-model
         env:
         - name: MEDDASH_BRANCH_NAME
-          value: "datapipelines-033"
+          value: "datapipelines-034"
         - name: MEDDASH_AWS_ACCESS_KEY_ID
           valueFrom:
             secretKeyRef:

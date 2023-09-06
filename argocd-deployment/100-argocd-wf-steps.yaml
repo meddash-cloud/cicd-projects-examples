@@ -51,7 +51,7 @@ spec:
     image: alpine/git:latest
     env:
     - name: MEDDASH_BRANCH_NAME
-      value: "datapipelines-033"
+      value: "datapipelines-034"
     volumeMounts:
     - name: pvc
       mountPath: "/home/jovyan/git-volume"
@@ -84,7 +84,7 @@ spec:
     image: kubeflownotebookswg/jupyter-pytorch-full
     env:
     - name: MEDDASH_BRANCH_NAME
-      value: "datapipelines-033"
+      value: "datapipelines-034"
     - name: MEDDASH_CLUSTER_ID
       value: "v1005r7c-bfef-4f0b-8028-99d5fdcf47de"
     volumeMounts:
